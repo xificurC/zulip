@@ -255,6 +255,9 @@ def setup_virtualenv(target_venv_path, requirements_file, virtualenv_args=None, 
 
 def add_cert_to_pipconf():
     conffile = os.path.expanduser("~/.pip/pip.conf")
+    confdir = os.path.expanduser("~/.pip/")
+    if not os.path.exists(confdir):
+        os.makedirs(confdir)
     if os.path.exists(conffile):
         newfile = os.path.expanduser("~/.pip/pip.conf.new")
         global_exists = False
