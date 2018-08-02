@@ -252,6 +252,33 @@ def setup_virtualenv(target_venv_path, requirements_file, virtualenv_args=None, 
     exec(open(activate_this).read(), {}, dict(__file__=activate_this))
     return cached_venv_path
 
+
+def add_cert_to_pipconf():
+    conffile = os.path.expanduser("~/.pip/pip.conf")
+    if os.path.exists(conffile):
+        newfile = os.path.expanduser("~/.pip/pip.conf.new")
+        global_exists = False
+        with open(newfile, 'w') as new:
+            with open(conffile, 'r') as old:
+                for line in old:
+                    if line.startswith('[global]'):
+                        global_exists = True
+                        new.write(line)
+                        new.write("cert = {}\n".format(os.environ.get('CUSTOM_CA_CERTIFICATES')))
+                    elif line.startswith('cert'):
+                        continue
+                    else:
+                        new.write(line)
+                if not global_exists:
+                    new.write('\n[global]\n')
+                    new.write("cert = {}\n".format(os.environ.get('CUSTOM_CA_CERTIFICATES')))
+        os.rename(newfile, conffile)
+    else:
+        with open(conffile, 'x') as new:
+            new.write('[global]\n')
+            new.write("cert = {}\n".format(os.environ.get('CUSTOM_CA_CERTIFICATES')))
+
+
 def do_setup_virtualenv(venv_path, requirements_file, virtualenv_args):
     # type: (str, str, List[str]) -> None
 
@@ -271,6 +298,10 @@ def do_setup_virtualenv(venv_path, requirements_file, virtualenv_args):
     # Switch current Python context to the virtualenv.
     activate_this = os.path.join(venv_path, "bin", "activate_this.py")
     exec(open(activate_this).read(), {}, dict(__file__=activate_this))
+
+    # use custom certificate if needed
+    if os.envion.get('CUSTOM_CA_CERTIFICATES'):
+        add_cert_to_pipconf()
 
     try:
         install_venv_deps(requirements_file)
