@@ -304,6 +304,7 @@ def do_setup_virtualenv(venv_path, requirements_file, virtualenv_args):
 
     # use custom certificate if needed
     if os.environ.get('CUSTOM_CA_CERTIFICATES'):
+        print("setting up pip to use custom CA certificates...")
         add_cert_to_pipconf()
 
     try:
