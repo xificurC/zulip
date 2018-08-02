@@ -300,7 +300,7 @@ def do_setup_virtualenv(venv_path, requirements_file, virtualenv_args):
     exec(open(activate_this).read(), {}, dict(__file__=activate_this))
 
     # use custom certificate if needed
-    if os.envion.get('CUSTOM_CA_CERTIFICATES'):
+    if os.environ.get('CUSTOM_CA_CERTIFICATES'):
         add_cert_to_pipconf()
 
     try:
